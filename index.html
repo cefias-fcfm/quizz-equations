@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz: ¿Qué ecuación de física/astro eres?</title>
+  
+  <!-- KaTeX para renderizar las fórmulas matemáticas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMath()"></script>
+
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #161e2e;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #2e384d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 650px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Pantalla inicial */
+    .hero {
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* Barra de Progreso */
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background-color: var(--border);
+      border-radius: 4px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      transition: width 0.3s ease;
+    }
+
+    /* Preguntas y Opciones */
+    .question-header {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .question-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      background: #1f293d;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 1rem;
+      line-height: 1.4;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn:hover {
+      background: #28354f;
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    /* Botón general */
+    .btn-action {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-action:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* Resultado */
+    .result-view {
+      text-align: center;
+    }
+
+    .result-badge {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.2);
+      color: #818cf8;
+      border: 1px solid #6366f1;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    .result-title {
+      font-size: 1.6rem;
+      margin-bottom: 12px;
+    }
+
+    .result-formula {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0 24px 0;
+      font-size: 1.2rem;
+      overflow-x: auto;
+    }
+
+    .result-desc {
+      color: #d1d5db;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .result-vibe {
+      font-style: italic;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Pantalla de Inicio -->
+  <div id="start-screen" class="hero">
+    <h1>¿Qué Ecuación de Física o Astro Eres?</h1>
+    <p>Responde 10 preguntas y descubre si tu personalidad se rige por la mecánica cuántica, la relatividad general o el puro caos termodinámico.</p>
+    <button class="btn-action" onclick="startQuiz()">Comenzar Quiz</button>
+  </div>
+
+  <!-- Pantalla del Quiz -->
+  <div id="quiz-screen" class="hidden">
+    <div class="progress-bar-container">
+      <div id="progress-bar" class="progress-bar"></div>
+    </div>
+    <div id="question-number" class="question-header">Pregunta 1 de 10</div>
+    <div id="question-text" class="question-text"></div>
+    <div id="options-container" class="options-list"></div>
+  </div>
+
+  <!-- Pantalla de Resultado -->
+  <div id="result-screen" class="result-view hidden">
+    <div class="result-badge">Tu resultado es</div>
+    <h2 id="result-title" class="result-title"></h2>
+    <div id="result-formula" class="result-formula"></div>
+    <div id="result-vibe" class="result-vibe"></div>
+    <div id="result-desc" class="result-desc"></div>
+    <button class="btn-action" onclick="resetQuiz()">Repetir el Quiz</button>
+  </div>
+</div>
+
+<script>
+  // Perfiles de Resultados
+  const profiles = {
+    einstein: {
+      name: "Ecuación de Campo de Einstein",
+      formula: "$$G_{\\mu\\nu} + \\Lambda g_{\\mu\\nu} = \\frac{8\\pi G}{c^4} T_{\\mu\\nu}$$",
+      vibe: "El/la que deforma el ambiente con su sola presencia.",
+      desc: "Tienes una gravedad social innegable: donde entras, la gente orbita a tu alrededor. Eres complejo/a, filosófico/a y ves conexiones profundas donde otros solo ven caos. A veces te sobrecargas de responsabilidades porque sientes que sostienes la estructura del espacio-tiempo de tu grupo."
+    },
+    schrodinger: {
+      name: "Ecuación de Schrödinger",
+      formula: "$$i\\hbar \\frac{\\partial \\psi}{\\partial t} = \\hat{H}\\psi$$",
+      vibe: "En constante crisis existencial y superposición de planes.",
+      desc: "Tu respuesta por defecto a salir es 'depende de cómo colapse la noche'. Tienes mil proyectos abiertos a la vez, cambias de vibra según quién te esté observando y vives cómodo/a en la incertidumbre. Hasta que no llegas al lugar, nadie sabe si existes o te quedaste durmiendo."
+    },
+    hubble: {
+      name: "Ley de Hubble-Lemaître",
+      formula: "$$v = H_0 \\, d$$",
+      vibe: "En fuga constante, socialmente expansivo/a.",
+      desc: "Mientras más lejos está alguien, más rápido te alejas tú de los compromisos innecesarios. Tienes visión a gran escala, siempre estás planeando tu próximo viaje o etapa de vida, y no te gusta quedarte estancado/a en un solo lugar. Tu ritmo de vida está en constante aceleración."
+    },
+    maxwell: {
+      name: "Ecuaciones de Maxwell",
+      formula: "$$\\nabla \\times \\mathbf{E} = -\\frac{\\partial \\mathbf{B}}{\\partial t}$$",
+      vibe: "La chispa social, hiperconectado/a y radiante.",
+      desc: "No sabes estar solo/a: si hay campo eléctrico, generas magnético; si alguien propone una idea, tú la propagas como onda de luz. Eres el pegamento del grupo, respondes mensajes en tres segundos y tienes una energía inagotable que ilumina cualquier junta."
+    },
+    chandrasekhar: {
+      name: "Límite de Chandrasekhar",
+      formula: "$$M \\approx 1.44 \\, M_\\odot$$",
+      vibe: "Al borde del colapso bajo presión extrema.",
+      desc: "Rindes de maravilla bajo estrés y aguantas cargas que quebrarían a cualquiera, pero todos saben que un gramo más de presión y colapsas en una supernova. Tienes límites claros: si te sobrepasan, la transformación es dramática e irreversible."
+    },
+    termodinamica: {
+      name: "Segunda Ley de la Termodinámica",
+      formula: "$$\\Delta S \\ge 0$$",
+      vibe: "Caos funcional, minimalismo energético.",
+      desc: "Tu habitación siempre tiende a la máxima entropía y no gastas energía en nada que no sea estrictamente espontáneo. Eres brutalmente honesto/a, odias las complicaciones y aceptas que la vida es un desorden natural. Tu lema es 'para qué esforzarse en revertir lo irreversible'."
+    },
+    schwarzschild: {
+      name: "Radio de Schwarzschild",
+      formula: "$$r_s = \\frac{2GM}{c^2}$$",
+      vibe: "Misterioso/a, magnético/a y sin retorno.",
+      desc: "Tienes un horizonte de sucesos emocional: es difícil entrar a tu círculo íntimo, pero quien cruza la barrera ya no puede salir. Eres reservado/a, observador/a, guardas los mejores secretos y proyectas un aura intrigante donde todo desaparece en un pozo de misterio."
+    },
+    drake: {
+      name: "Ecuación de Drake",
+      formula: "$$N = R_* \\cdot f_p \\cdot n_e \\cdot f_l \\cdot f_i \\cdot f_c \\cdot L$$",
+      vibe: "El/la soñador/a optimista que sobreanaliza todo.",
+      desc: "Pasas horas teorizando sobre posibilidades absurdas. Eres curioso/a, te encantan las conversaciones de trasnoche sobre vida extraterrestre o el futuro, y calculas mentalmente cada escenario y variable antes de dar un paso importante."
+    }
+  };
+
+  // Preguntas y mapeo
+  const questions = [
+    {
+      q: "¿Cómo organizas tu fin de semana?",
+      options: [
+        { text: "No organizo nada: mientras menos esfuerzo haga para ordenar mi vida, más espontáneo y natural todo.", key: "termodinamica" },
+        { text: "Tengo un plan A, B, C y D; hasta que no llegue el sábado a las 8 PM, todas las opciones existen a la vez.", key: "schrodinger" },
+        { text: "Armo junta grupal masiva, mando audios a tres chats a la vez y me aseguro de que todos estén conectados.", key: "maxwell" },
+        { text: "Agendo tres viajes o paseos lejos de mi casa; si me quedo quieto/a en el mismo lugar siento que me estanco.", key: "hubble" }
+      ]
+    },
+    {
+      q: "Te enfrentas a una semana con 4 entregas y 2 exámenes. Tu reacción:",
+      options: [
+        { text: "Sostengo la calma y trabajo al límite... pero si me agregan una sola tarea más, colapso en una explosión.", key: "chandrasekhar" },
+        { text: "Me pongo a calcular la probabilidad estadística exacta de pasar el semestre si ignoro una materia.", key: "drake" },
+        { text: "Mi sola presencia en el grupo de estudio impone orden; todos terminan trabajando al ritmo que marco.", key: "einstein" },
+        { text: "Apago las notificaciones y me vuelvo invisible; crucé mi propio horizonte de sucesos y nadie sabe de mí.", key: "schwarzschild" }
+      ]
+    },
+    {
+      q: "Llegas a una fiesta donde conoces a poca gente. ¿Qué haces?",
+      options: [
+        { text: "Me quedo en un rincón estratégico con cara de misterio; el que quiera hablarme tendrá que acercarse.", key: "schwarzschild" },
+        { text: "En 15 minutos ya sé el nombre de todos, presenté a dos desconocidos y cambié la música.", key: "maxwell" },
+        { text: "No me muevo del sillón: la gente termina llegando sola a sentarse y conversar conmigo.", key: "einstein" },
+        { text: "Ya estoy pensando a qué hora y con qué excusa fugarme hacia otro plan más interesante.", key: "hubble" }
+      ]
+    },
+    {
+      q: "¿Cómo está tu habitación en este momento?",
+      options: [
+        { text: "En estado de máxima entropía. La ropa en la silla es un proceso termodinámicamente irreversible.", key: "termodinamica" },
+        { text: "Depende: si nadie abre la puerta para mirar, está ordenada y desordenada al mismo tiempo.", key: "schrodinger" },
+        { text: "Impecable y funcional hasta que llega el fin de semestre y explota bajo la presión.", key: "chandrasekhar" },
+        { text: "Llena de notas adhesivas, mapas mentales y listas de probabilidades sobre planes a futuro.", key: "drake" }
+      ]
+    },
+    {
+      q: "Tu amigo/a te cuenta un drama amoroso. Tu consejo:",
+      options: [
+        { text: "'Mira las probabilidades: en una galaxia con billones de personas, las chances de encontrar a alguien mejor son altas.'", key: "drake" },
+        { text: "'El universo tiende al caos, acéptalo. Deja de gastar energía intentando arreglar lo que no tiene vuelta.'", key: "termodinamica" },
+        { text: "'Esa persona deforma toda tu realidad; aléjate antes de que su influencia te atrape para siempre.'", key: "einstein" },
+        { text: "'Esa relación es un punto de no retorno: si sigues ahí, vas a desaparecer en un hoyo negro emocional.'", key: "schwarzschild" }
+      ]
+    },
+    {
+      q: "Si fueras a un viaje con amigos, ¿cuál sería tu rol?",
+      options: [
+        { text: "El/la que siempre quiere ir más lejos, explorar otra ciudad y no volver temprano al hotel.", key: "hubble" },
+        { text: "El/la que lleva los parlantes, el cargador portátil y mantiene la vibra encendida todo el camino.", key: "maxwell" },
+        { text: "El/la que carga con todo el equipaje y los horarios hasta que se le agota la paciencia y colapsa.", key: "chandrasekhar" },
+        { text: "El/la que hasta último minuto en el aeropuerto nadie sabía si realmente iba a llegar al vuelo.", key: "schrodinger" }
+      ]
+    },
+    {
+      q: "Una conversación nocturna a las 3:00 AM con amigos debe ser sobre:",
+      options: [
+        { text: "Si existe vida inteligente en otros planetas y por qué aún no nos han contactado.", key: "drake" },
+        { text: "El sentido profundo de la existencia y cómo nuestras decisiones moldean el entorno de los demás.", key: "einstein" },
+        { text: "Secretos inconfesables que jamás saldrán de esa habitación bajo ninguna circunstancia.", key: "schwarzschild" },
+        { text: "Dilemas absurdos tipo: ¿y si cerramos los ojos y este momento deja de existir?", key: "schrodinger" }
+      ]
+    },
+    {
+      q: "¿Cuál es tu mayor defecto cuando estás en un grupo de trabajo?",
+      options: [
+        { text: "Me sobrecargo asumiendo el 90% de la pega hasta que estoy al borde del colapso total.", key: "chandrasekhar" },
+        { text: "Me disperso hablando con todo el mundo y propagando ideas en vez de sentarme a redactar.", key: "maxwell" },
+        { text: "Desaparezco por días sin dar señales de vida y luego reaparezco con mi parte lista de la nada.", key: "schwarzschild" },
+        { text: "Procrastino al máximo porque creo firmemente en ahorrar energía hasta el último segundo.", key: "termodinamica" }
+      ]
+    },
+    {
+      q: "Tu forma de lidiar con un cambio de planes imprevisto:",
+      options: [
+        { text: "Excelente: mientras más cambien las cosas, más rápido me muevo hacia nuevos horizontes.", key: "hubble" },
+        { text: "Lo acepto: el cambio es la única ley universal, luchar contra la entropía es inútil.", key: "termodinamica" },
+        { text: "Me adapto al instante: para mí cualquier plan alternativo es solo otra rama de posibilidades válida.", key: "schrodinger" },
+        { text: "Empiezo a calcular mentalmente los nuevos escenarios y variables posibles para no dejar nada al azar.", key: "drake" }
+      ]
+    },
+    {
+      q: "Si tu personalidad fuera una fuerza de la naturaleza, sería:",
+      options: [
+        { text: "Una curvatura masiva que hace que todo el mundo termine gravitando hacia ti.", key: "einstein" },
+        { text: "Una radiación electromagnética que viaja a toda velocidad iluminando todo a su paso.", key: "maxwell" },
+        { text: "Una aceleración constante que empuja los límites cada vez más lejos.", key: "hubble" },
+        { text: "Una masa compacta ultra resistente que aguanta la presión más extrema del universo.", key: "chandrasekhar" }
+      ]
+    }
+  ];
+
+  let currentQuestion = 0;
+  let scores = {
+    einstein: 0,
+    schrodinger: 0,
+    hubble: 0,
+    maxwell: 0,
+    chandrasekhar: 0,
+    termodinamica: 0,
+    schwarzschild: 0,
+    drake: 0
+  };
+
+  function startQuiz() {
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    currentQuestion = 0;
+    scores = { einstein: 0, schrodinger: 0, hubble: 0, maxwell: 0, chandrasekhar: 0, termodinamica: 0, schwarzschild: 0, drake: 0 };
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const qData = questions[currentQuestion];
+    document.getElementById('question-number').innerText = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+    document.getElementById('question-text').innerText = qData.q;
+    
+    // Actualizar barra de progreso
+    const progress = ((currentQuestion) / questions.length) * 100;
+    document.getElementById('progress-bar').style.width = `${progress}%`;
+
+    const optionsContainer = document.getElementById('options-container');
+    optionsContainer.innerHTML = '';
+
+    qData.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerText = opt.text;
+      btn.onclick = () => selectOption(opt.key);
+      optionsContainer.appendChild(btn);
+    });
+  }
+
+  function selectOption(key) {
+    scores[key]++;
+    currentQuestion++;
+
+    if (currentQuestion < questions.length) {
+      showQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('result-screen').classList.remove('hidden');
+
+    // Determinar ganador
+    let winningProfileKey = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+    const profile = profiles[winningProfileKey];
+
+    document.getElementById('result-title').innerText = profile.name;
+    document.getElementById('result-formula').innerHTML = profile.formula;
+    document.getElementById('result-vibe').innerText = `"${profile.vibe}"`;
+    document.getElementById('result-desc').innerText = profile.desc;
+
+    renderMath();
+  }
+
+  function resetQuiz() {
+    document.getElementById('result-screen').classList.add('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
+  }
+
+  function renderMath() {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false
+      });
+    }
+  }
+</script>
+</body>
+</html>
