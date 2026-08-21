@@ -291,7 +291,7 @@
       "M ⊙", "∑", "α", "φ", "r_s = 2GM/c²", "ΔS ≥ 0",
       "N = R*·fp", "β", "10¹¹", "θ", "μ₀", "∇²"
     ];
-    const numStars = 26;
+    const numStars = 35;
     const fragment = document.createDocumentFragment();
 
     for (let i = 0; i < numStars; i++) {
@@ -303,7 +303,7 @@
       const fontSize = (Math.random() * 0.9 + 0.9).toFixed(2); // 0.9rem - 1.8rem
       const duration = (Math.random() * 14 + 18).toFixed(2); // 18s - 32s
       const delay = (Math.random() * 25).toFixed(2); // 0s - 25s
-      const maxOpacity = (Math.random() * 0.12 + 0.08).toFixed(2); // 0.08 - 0.20
+      const maxOpacity = (Math.random() * 0.20 + 0.25).toFixed(2); // 0.25 - 0.45
       const rotStart = `${(Math.random() * 16 - 8).toFixed(1)}deg`;
       const rotEnd = `${(Math.random() * 16 - 8).toFixed(1)}deg`;
 
